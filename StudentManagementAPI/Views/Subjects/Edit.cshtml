@@ -1,41 +1,21 @@
 ﻿@model StudentManagementAPI.Models.Subject
 
-
-
 <h2>Edit Subject</h2>
 
-
-
 <form asp-action="Edit" method="post">
-
     <input type="hidden" asp-for="SubjectID" /> <!-- Hidden field to store SubjectID -->
 
-
-
     <div class="form-group">
-
         <label asp-for="SubjectName" class="control-label"></label>
-
         <input asp-for="SubjectName" class="form-control" />
-
         <span asp-validation-for="SubjectName" class="text-danger"></span>
-
     </div>
-
     <div class="form-group">
-
         <label asp-for="SubjectLecturer" class="control-label"></label>
-
         <input asp-for="SubjectLecturer" class="form-control" />
-
         <span asp-validation-for="SubjectLecturer" class="text-danger"></span>
-
     </div>
-
-
 
     <button type="submit" class="btn btn-primary">Save</button>
-
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-
-</form> 
+</form>

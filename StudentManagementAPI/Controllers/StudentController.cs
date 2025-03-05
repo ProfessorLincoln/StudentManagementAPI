@@ -1,161 +1,136 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.EntityFrameworkCore;
-
 using StudentManagementAPI.Data;
-
 using StudentManagementAPI.Models;
-
-
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace StudentManagementAPI.Controllers
-
 {
-
-    [Route("api/[controller]")]
-
-    [ApiController]
-
-    public class StudentsController : ControllerBase
-
+    [Route("[controller]")]
+    public class StudentsController : Controller
     {
-
         private readonly StudentManagementContext _context;
 
-
-
         public StudentsController(StudentManagementContext context)
-
         {
-
             _context = context;
-
         }
 
-
-
-        // GET: api/Students 
-
+        // GET: Students
         [HttpGet]
-
-        public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
-
+        public async Task<IActionResult> Index()
         {
-
-            return await _context.Students.ToListAsync();
-
+            var students = await _context.Students.ToListAsync();
+            return View(students); // Returns the list view of students
         }
 
-
-
-        // GET: api/Students/5 
-
-        [HttpGet("{id}")]
-
-        public async Task<ActionResult<Student>> GetStudent(int id)
-
+        // GET: Students/Details/5
+        [HttpGet("Details/{id}")]
+        public async Task<IActionResult> Details(int id)
         {
-
             var student = await _context.Students.FindAsync(id);
-
-
-
             if (student == null)
-
             {
-
                 return NotFound();
-
             }
 
-
-
-            return student;
-
+            return View(student); // Returns the details view of a specific student
         }
 
-
-
-        // POST: api/Students 
-
-        [HttpPost]
-
-        public async Task<ActionResult<Student>> PostStudent(Student student)
-
+        // GET: Students/Create
+        [HttpGet("Create")]
+        public IActionResult Create()
         {
-
-            _context.Students.Add(student);
-
-            await _context.SaveChangesAsync();
-
-
-
-            return CreatedAtAction("GetStudent", new { id = student.StudentID }, student);
-
+            return View(); // Returns the view for creating a new student
         }
 
-
-
-        // PUT: api/Students/5 
-
-        [HttpPut("{id}")]
-
-        public async Task<IActionResult> PutStudent(int id, Student student)
-
+        // POST: Students/Create
+        [HttpPost("Create")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Student student)
         {
+            if (ModelState.IsValid)
+            {
+                _context.Add(student);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index)); // Redirects to the student list
+            }
+            return View(student);
+        }
 
+        // GET: Students/Edit/5
+        [HttpGet("Edit/{id}")]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+            return View(student); // Returns the edit view for a specific student
+        }
+
+        // POST: Students/Edit/5
+        [HttpPost("Edit/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Student student)
+        {
             if (id != student.StudentID)
-
             {
-
                 return BadRequest();
-
             }
 
-
-
-            _context.Entry(student).State = EntityState.Modified;
-
-            await _context.SaveChangesAsync();
-
-
-
-            return NoContent();
-
-        }
-
-
-
-        // DELETE: api/Students/5 
-
-        [HttpDelete("{id}")]
-
-        public async Task<IActionResult> DeleteStudent(int id)
-
-        {
-
-            var student = await _context.Students.FindAsync(id);
-
-            if (student == null)
-
+            if (ModelState.IsValid)
             {
-
-                return NotFound();
-
+                try
+                {
+                    _context.Update(student);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!StudentExists(id))
+                    {
+                        return NotFound();
+                    }
+                    throw;
+                }
+                return RedirectToAction(nameof(Index)); // Redirects to the student list
             }
-
-
-
-            _context.Students.Remove(student);
-
-            await _context.SaveChangesAsync();
-
-
-
-            return NoContent();
-
+            return View(student);
         }
 
-    }
+        // GET: Students/Delete/5
+        [HttpGet("Delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student == null)
+            {
+                return NotFound();
+            }
 
+            return View(student); // Returns the delete confirmation view
+        }
+
+        // POST: Students/Delete/5
+        [HttpPost("Delete/{id}"), ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var student = await _context.Students.FindAsync(id);
+            if (student != null)
+            {
+                _context.Students.Remove(student);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index)); // Redirects to the student list
+        }
+
+        private bool StudentExists(int id)
+        {
+            return _context.Students.Any(e => e.StudentID == id);
+        }
+    }
 }
