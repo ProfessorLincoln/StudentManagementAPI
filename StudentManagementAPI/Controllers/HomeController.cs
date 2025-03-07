@@ -30,3 +30,4 @@ namespace StudentManagementAPI.Controllers
         }
     }
 }
+nigga
