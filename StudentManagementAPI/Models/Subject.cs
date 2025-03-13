@@ -17,6 +17,6 @@ namespace StudentManagementAPI.Models
         public string SubjectLecturer { get; set; }
 
         // Many-to-Many Relationship with Students
-        public List<StudentSubject> StudentSubjects { get; set; }
+        public List<StudentSubject>? StudentSubjects { get; set; }
     }
 }
