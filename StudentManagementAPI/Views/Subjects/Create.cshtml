@@ -3,16 +3,10 @@
 <h2>Create New Subject</h2>
 
 <form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="SubjectName" class="control-label"></label>
-        <input asp-for="SubjectName" class="form-control" />
-        <span asp-validation-for="SubjectName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="SubjectLecturer" class="control-label"></label>
-        <input asp-for="SubjectLecturer" class="form-control" />
-        <span asp-validation-for="SubjectLecturer" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <input asp-for="SubjectName" class="form-control" required />
+    <input asp-for="SubjectLecturer" class="form-control" required />
+
+
+    <button type="submit">Create</button>
 </form>
+

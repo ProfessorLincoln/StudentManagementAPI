@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StudentManagementAPI.Data;
 using StudentManagementAPI.Models;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace StudentManagementAPI.Controllers
@@ -42,22 +44,39 @@ namespace StudentManagementAPI.Controllers
         [HttpGet("Create")]
         public IActionResult Create()
         {
-            return View(); // Returns the view for creating a new student
+            ViewData["Subjects"] = new SelectList(_context.Subjects, "SubjectID", "SubjectName");
+            return View();
         }
 
         // POST: Students/Create
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Student student)
+        public async Task<IActionResult> Create(Student student, int[] SubjectIDs)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(student);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index)); // Redirects to the student list
+                // 🔴 Ensure subjects are reloaded if validation fails
+                ViewData["Subjects"] = new SelectList(_context.Subjects, "SubjectID", "SubjectName");
+                return View(student);
             }
-            return View(student);
+
+            _context.Students.Add(student);
+            await _context.SaveChangesAsync();
+
+            // Assign selected subjects
+            foreach (var subjectId in SubjectIDs)
+            {
+                _context.StudentSubjects.Add(new StudentSubject
+                {
+                    StudentID = student.StudentID,
+                    SubjectID = subjectId
+                });
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+        
 
         // GET: Students/Edit/5
         [HttpGet("Edit/{id}")]

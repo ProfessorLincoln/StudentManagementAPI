@@ -48,13 +48,17 @@ namespace StudentManagementAPI.Controllers
         // POST: Subjects/Create
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Subject subject)
+        public IActionResult Create(Subject subject)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(subject);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index)); // Redirects to the subject list
+                _context.Subjects.Add(subject);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                Console.WriteLine(error.ErrorMessage);
             }
             return View(subject);
         }
